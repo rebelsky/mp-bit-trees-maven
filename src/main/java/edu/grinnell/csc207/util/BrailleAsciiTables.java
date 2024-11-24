@@ -180,21 +180,28 @@ public class BrailleAsciiTables {
   /**
    * A tree that maps ASCII to Braille.
    */
-  static BitTree a2bTree = null;
+  static BitTree a2bTree = loadTree(8, a2b);
 
   /**
    *
    */
-  static BitTree b2aTree = null;
+  static BitTree b2aTree = loadTree(6, b2a);
 
   /**
    *
    */
-  static BitTree b2uTree = null;
+  static BitTree b2uTree = loadTree(6, b2u);
 
   // +-----------------------+---------------------------------------
   // | Static helper methods |
   // +-----------------------+
+
+  /**
+   * Convert some bytes to unicode.
+   */
+  static String byteStringToUnicode(String bytes) {
+    return new String(Character.toChars(Integer.parseUnsignedInt(bytes, 16)));
+  } // byteStringToUnicode(String)
 
   /**
    * Convert a character to a bit string.
@@ -204,7 +211,7 @@ public class BrailleAsciiTables {
     StringBuilder builder = new StringBuilder();
     int pos = 128;
     while (pos >= 1) {
-      builder.append((val > pos) ? '1' : '0');
+      builder.append((val >= pos) ? '1' : '0');
       val = val % pos;
       pos = pos / 2;
     } // while
@@ -234,17 +241,13 @@ public class BrailleAsciiTables {
    *
    */
   public static String toBraille(char letter) {
-    return "";  // STUB
+    return a2bTree.get(char2bits(letter));
   } // toBraille(char)
 
   /**
    *
    */
   public static String toAscii(String bits) {
-    // Make sure we've loaded the braille-to-ASCII tree.
-    if (null == b2aTree) {
-      b2aTree = loadTree(6, b2a);
-    } // if
     return b2aTree.get(bits);
   } // toAscii(String)
 
@@ -252,6 +255,6 @@ public class BrailleAsciiTables {
    *
    */
   public static String toUnicode(String bits) {
-    return "";  // STUB
+    return byteStringToUnicode(b2uTree.get(bits));
   } // toUnicode(String)
 } // BrailleAsciiTables
